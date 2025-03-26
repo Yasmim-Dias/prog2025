@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+ <html>
+   <head>
+     <meta charset="utf-8">
+     <title>Revisão - Programação III - 2025</title>
+     <style>
+      .caixa{
+        border-style: solid;
+        border-width: 1px;
+      }
+     </style>
+     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+   </head>
+   <body>
+    <h1 style="text-align: center;">Cadastro de Veículos</h1>
+    <div>
+      <div style="width: 71%; margin: 5px;" class="caixa">
+        <div>
+          <div style="float: left; margin-right: 10px;">
+            <label for="">Código:</label><br>
+            <label for="">Modelo:</label>
+          </div>
+          <div style="float: left;">
+            <input id="campoCodigo" type="number"><br>
+            <input id="campoModelo" type="text" size="50">
+          </div>
+        </div>
+      </div>
+      <div style="clear: both; float: left; width: 35%; height: 40%; margin: 5px;" class="caixa">
+        <div style="margin: 2px;">
+          <div style="float: left;margin-right: 10px;">
+            <label for="">Situação:</label><br>
+            <label for="">Valor:</label><br>
+            <label for="">Data:</label><br>
+          </div>
+          <div style="float: left;">
+              <input id="campoSituacao" type="checkbox"><br>
+              <input id="campoValor" type="number" step="0.1"><br>
+              <input id="campoData" type="date">
+          </div>
+        </div>
+      </div>
+      <div style="float: left; width: 35%; height: 40%; margin: 5px;" class="caixa">
+        <div style="margin: 2px;">
+          <div style="float: left;margin-right: 10px;">
+            <label for="">Observações:</label><br>
+          </div>
+          <div style="float: left;">
+              <textarea name="" id="campoObs" rows="4" cols="35"></textarea>
+          </div>
+        </div>
+      </div>
+      <div style="clear: both;margin-left: 30%;">
+          <button id="btnCadastrar">Cadastrar</button>
+          <button id="btnLimpar">Limpar</button>
+      </div>
+    <div>
+      <div class="centro">
+        <table id="tabelaVeiculos" border="1">
+            <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Modelo</th>
+                <th scope="col">Data</th>
+                <th scope="col">Valor</th>                               
+            </tr> 
+            <tbody id="corpoTabela">
+            </tbody>
+        </table>
+    </div>
+    </div>
+    </body>
+    <script type="text/javascript">
+        function validarDados() {
+            var codigo = parseInt(document.getElementById("campoCodigo").value);
+            var modelo = document.getElementById("campoModelo").value.trim();
+            var valor = parseFloat(document.getElementById("campoValor").value);
+            var data = new Date(document.getElementById("campoData").value);
+            var dataAtual = new Date();
+            
+            if (isNaN(codigo) || codigo < 1 || codigo > 10000) {
+                alert("Código inválido! Deve estar entre 1 e 10.000.");
+                return false;
+            }
+            if (modelo.length < 1 || modelo.length > 1000) {
+                alert("Modelo inválido! Deve ter entre 1 e 1000 caracteres.");
+                return false;
+            }
+            if (isNaN(valor) || valor < 1000 || valor > 10000) {
+                alert("Valor inválido! Deve estar entre 1.000 e 10.000,00.");
+                return false;
+            }
+            if (isNaN(data.getTime()) || data >= dataAtual) {
+                alert("Data inválida! Deve ser anterior à data atual.");
+                return false;
+            }
+            return true;
+        }
+
+        function limparCampos() {
+            document.getElementById("campoCodigo").value = "";
+            document.getElementById("campoModelo").value = "";
+            document.getElementById("campoValor").value = "";
+            document.getElementById("campoData").value = "";
+            document.getElementById("campoObs").value = "";
+        }
+
+        $("#btnCadastrar").click(function () {
+            if (validarDados()) {
+                let codigo = document.getElementById("campoCodigo").value;
+                let modelo = document.getElementById("campoModelo").value;
+                let valor = document.getElementById("campoValor").value;
+                let data = document.getElementById("campoData").value;
+                
+                let novaLinha = `<tr><td>${codigo}</td><td>${modelo}</td><td>${data}</td><td>${valor}</td></tr>`;
+                document.getElementById("corpoTabela").innerHTML += novaLinha;
+                
+                limparCampos();
+            }
+        });
+
+        $("#btnLimpar").click(function () {
+            limparCampos();
+        });
+    </script>
+</html>

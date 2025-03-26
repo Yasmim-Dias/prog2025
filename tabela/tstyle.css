@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0f0ff;
+    color: #003366;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+h1 {
+    color: #002244;
+}
+
+.caixa {
+    border: 2px solid #0055a5;
+    background-color: #b3d9ff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+input, textarea, button {
+    font-size: 16px;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 3px;
+    border: 1px solid #0055a5;
+    background-color: #cce6ff;
+    color: #003366;
+}
+
+button {
+    background-color: #0055a5;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #003366;
+}
+
+#tabelaVeiculos {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+#tabelaVeiculos th, #tabelaVeiculos td {
+    border: 1px solid #003366;
+    padding: 10px;
+    text-align: center;
+}
+
+#tabelaVeiculos th {
+    background-color: #0055a5;
+    color: white;
+}
