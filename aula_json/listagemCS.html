@@ -52,7 +52,8 @@
                             <input type="text" v-model="novo_jogador.indice" class="form__input" id="inputIndice" disabled>
                         </div>
 
-                        <div class="error" v-if="!$v.novo_jogador.nickname.required">Nickname deve ter no mínimo {{$v.novo_jogador.nickname.$params.minLength.min}} caracteres.</div>
+                        <div class="error" v-if="!$v.novo_jogador.nickname.required">
+                            Nickname deve ter no mínimo {{$v.novo_jogador.nickname.$params.minLength.min}} caracteres.</div>
                         <div class="form-group">
                             <label class="form__label" for="inputNickname">Nickname:</label>
                             <input class="form__input" type="text" v-model.trim="$v.novo_jogador.nickname.$model" :class="status($v.novo_jogador.nickname)" id="inputNickname">
@@ -64,7 +65,8 @@
                             <input class="form__input" type="date" v-model="$v.novo_jogador.data_nascimento.$model" :class="status($v.novo_jogador.data_nascimento)" id="inputDtNasc">
                         </div>
                         
-                        <div class="error" v-if="!$v.novo_jogador.qtd_estrela.between">Informe um valor entre  {{$v.novo_jogador.qtd_estrela.$params.between.min}} e {{$v.novo_jogador.qtd_estrela.$params.between.max}}.</div>
+                        <div class="error" v-if="!$v.novo_jogador.qtd_estrela.between">
+                            Informe um valor entre  {{$v.novo_jogador.qtd_estrela.$params.between.min}} e {{$v.novo_jogador.qtd_estrela.$params.between.max}}.</div>
                         <div class="form-group">
                             <label class="form__label" for="inputQtdEstrela">Quantidade de Estrelas:</label>                            
                             <input class="form__input" type="number" v-model="$v.novo_jogador.qtd_estrela.$model" :class="status($v.novo_jogador.qtd_estrela)" id="inputQtdEstrela">

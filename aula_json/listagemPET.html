@@ -1,0 +1,262 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vue - listagem, inserção e edição de Jogadores</title>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../css/estilo.css" />
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+        <script src="https://unpkg.com/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
+        <script src="https://unpkg.com/vuelidate@0.7.4/dist/validators.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+    </head> 
+    <body>         
+        <div id="app" class="container">               
+                <h2>Listagem de Pet no CS</h2>   
+
+                <table class="table table-striped" >
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Vacinação</th>                            
+                        <th scope="col">Alterar</th>
+                        <th scope="col">Remover</th>
+                    </tr>                     
+                    <tbody>
+                        <tr v-for="(p, indice) in pets">                                                
+                                <td>{{indice}}</td>
+                                <td>{{p.nome}}</td>
+                                <td>{{p.cpf}}</td>
+                                <td>{{p.data_nascimento}}</td>
+                                <td>{{p.valor}}</td>
+                                <td>{{p.raca.descricao}}</td>
+                                <td v-if="p.vacinacao"><input type="checkbox" checked disabled></td>
+                                <td v-if="!p.vacinacao"><input type="checkbox" disabled></td>
+                                <td><button v-on:click="editPet(indice)" class="btn" type="button">Alterar</button></td>
+                                <td><button v-on:click="remPet(indice)" class="btn" type="button">Remover</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <form id="formulario">
+                                        
+                    <h3>Formulário para cadastrar novo jogador</h3>                        
+
+                        <div class="form-group">
+                            <label for="inputIndice">#:</label>
+                            <input type="text" v-model="novo_pet.indice" class="form__input" id="inputIndice" disabled>
+                        </div>
+
+                        <div class="error" v-if="!$v.novo_pet.nome.between">
+                            Nome deve ter entre {{$v.novo_pet.nome.$params.between.min}} e {{$v.novo_pet.nome.$params.between.max}} caracteres.</div>
+                        <div class="form-group">
+                            <label class="form__label" for="inputNome">Nome:</label>
+                            <input class="form__input" type="text" v-model.trim="$v.novo_pet.nome.$model" :class="status($v.novo_pet.nome)" id="inputNome">
+                        </div>
+                        
+                        <div class="error" v-if="!$v.novo_pet.data_nascimento.minValue">Informe uma data válida (anterior a data atual).</div>
+                        <div class="form-group">
+                            <label class="form__label" for="inputDtNasc">D. Nascimento:</label>                            
+                            <input class="form__input" type="date" v-model="$v.novo_pet.data_nascimento.$model" :class="status($v.novo_pet.data_nascimento)" id="inputDtNasc">
+                        </div>
+                        
+                        <div class="error" v-if="!$v.novo_pet.valor.between">
+                            Informe um valor entre  {{$v.novo_pet.valor.$params.between.min}} e {{$v.novo_pet.valor.$params.between.max}}.</div>
+                        <div class="form-group">
+                            <label class="form__label" for="inputValor">Valor:</label>                            
+                            <input class="form__input" type="number" v-model="$v.novo_pet.valor.$model" :class="status($v.novo_pet.valor)" id="inputValor">
+                        </div>
+
+                        <div class="error" v-if="!$v.novo_pet.cpf.minLength">
+                            Informe os  {{$v.novo_pet.cpf.$params.minLength.min}} digitos.</div>
+                        <div class="form-group">
+                            <label class="form__label" for="inputCpf">Cpf do Tutor:</label>                            
+                            <input class="form__input" type="number" v-model="$v.novo_pet.cpf.$model" :class="status($v.novo_pet.cpf)" id="inputCpf">
+                        </div>
+
+                        <div class="error" v-if="!$v.novo_pet.raca.required">Selecione uma opção.</div>
+                      
+                        <div class="form-group">
+                            <label class="form__label" for="selectRaca">Raça:</label>
+                            <select class="form__input" v-model="$v.novo_pet.raca.$model" :class="status($v.novo_pet.raca)" id="selectRaca">                                
+                                <option v-for="r in racas" v-bind:value="r">
+                                    {{ r.descricao }}
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="checkVacinacao">Vacinacao:</label>
+                            <input type="checkbox" v-model="novo_pet.vacinacao" id="checkVacinacao"><!--Atividade 1 - Aplicar um input mais apropriado. -->
+                        </div>
+
+
+                        
+                        <button @click="addPet($v)" class="btn btn-primary" type="button">Salvar</button>
+                        <button @click="cleanFormulario" class="btn btn-primary" type="button">Limpar</button>
+                        
+                        </div>
+                                                                        
+                </form>
+      
+
+        </div>       
+    </body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var dados = { 
+                    //utilizado para o select de patentes
+                    racas: [{codigo: 1, descricao: 'Pug'},{codigo: 2, descricao: 'Golden'},{codigo: 3, descricao: 'Pincher'}],
+
+                    //utilizado para listar os jogadores na tabela html
+                    pets:  [ {nome: 'Madona', data_nascimento: '', Valor: 100, vacinacao: true, raca: {descricao: 'Pug'} }], 
+                            
+                    //utilizado para ligar com os inputs do formulário.
+                    novo_pet: {indice: '', nome: '', data_nascimento: '', valor: 0, vacinacao: true, raca: {}}
+            };
+
+        //https://br.vuejs.org/v2/guide/forms.html 
+        //https://vuelidate.js.org/#sub-basic-form
+        //https://vuelidate-next.netlify.app/#getting-started-2
+        //https://github.com/vuelidate/vuelidate
+        //https://br.vuejs.org/v2/cookbook/form-validation.html
+        //https://vuelidate.js.org/                        
+         
+        Vue.use(window.vuelidate.default);
+
+        const {
+            required,
+            minLength,
+            maxLengt,
+            minValue,
+            between
+        } = window.validators
+
+          new Vue({ 
+                el: '#app', 
+                data: dados,
+                validations: {
+                    novo_pet: {
+                                    nome: {
+                                        required, 
+                                        between: between(4, 12)
+                                    },
+                                    data_nascimento: {
+                                        required,                                        
+                                        minValue: value => value < new Date().toISOString()
+                                    },
+                                    valor: {
+                                        required,
+                                        between: between(1, 100)
+                                    },
+                                    cpf: {
+                                        required, 
+                                        minLength: minLength(11)
+                                    },
+                                    raca: {
+                                        required
+                                    }
+                    }
+                },
+                methods: { 
+
+                    isLetter(e) {
+                        let char = String.fromCharCode(e.keyCode); // Get the character
+                        if(/^[A-Za-z]+$/.test(char)) 
+                            return true; // Match with regex 
+                        else 
+                            e.preventDefault(); // If not match, don't add to input text
+                    },
+
+                    status(validation) {
+                        return {
+                            error: validation.$error,
+                            dirty: validation.$dirty
+                        }
+                    },
+
+                    addPet: function (v) {
+                        
+                        if(!v.$invalid){
+
+                            //documentação sobre o parseInt
+                            //https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/parseInt
+                            if(isNaN(parseInt(this.novo_pet.indice))){
+                                
+                                this.pets.push({nome: this.novo_pet.nome, 
+                                                 data_nascimento: this.novo_pet.data_nascimento.trim(), 
+                                                 valor: this.novo_pet.valor, 
+                                                 vacinacao: this.novo_pet.vacinacao, 
+                                                 raca:this.novo_pet.raca}
+                                                );
+                                alert('Novo Pet cadastrado !');
+
+                            }else{
+
+                                this.pets[this.novo_pet.indice] = {nome: this.novo_pet.nome.trim(), 
+                                                 data_nascimento: this.novo_jogador.data_nascimento.trim(), 
+                                                 valor: this.novo_pet.valor, 
+                                                 vacinacao: this.novo_pet.vacinacao, 
+                                                 raca:this.novo_pet.raca
+                                                };
+
+                                alert('Jogador alterado !');
+                            }
+                            this.cleanFormulario();
+
+                        }else{
+                            alert("Atenção !! Formulário incompleto.");
+                        }
+                    },
+
+                    editPet: function (param_index) {
+
+                        this.novo_pet.indice = param_index;
+                        this.novo_pet.nome = this.pets[param_index].nome; 
+                        this.novo_pet.data_nascimento = this.pets[param_index].data_nascimento;
+                        this.novo_pet.valor = this.pets[param_index].valor;
+                        this.novo_pet.raca = this.pets[param_index].raca;
+                    },
+
+                    remPet: function(param_index){
+                        
+                        var r = confirm("Deseja realmente remover o Jogador " + this.pets[param_index].nome);
+                        if (r == true) {
+                            
+                            //documentacao sobre o splice
+                            //https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+                            //remove 1 elemento do índice definido pela variavel param_index                        
+                            this.pets.splice(param_index, 1);
+
+                            alert('Removeu o pet. ');
+
+                        } else {
+
+                            alert('O pet: ' + this.pets[param_index].nome + " não foi removido.");
+                        }                        
+                        
+                    },
+                    
+                    cleanFormulario: function() {
+
+                        this.novo_pet.indice = '';
+                        this.novo_pet.nome = ''; 
+                        this.novo_pet.data_nascimento = '';
+                        this.novo_pet.valor = 0;
+                        this.novo_pet.vacinacao = true;
+                        this.novo_pet.raca = '';
+                    }
+
+                }
+            }); 
+        });
+
+            //Implmentar o armazenamento pelo LocalStorage!!!!!!!!!!!!! tema
+
+    </script> 
+   
+ </html> 
