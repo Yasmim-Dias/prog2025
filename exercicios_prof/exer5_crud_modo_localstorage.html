@@ -1,0 +1,160 @@
+<!--
+        Com base no exemplo Vue_crud_localstorage.html
+
+        1) Implementar validação do manual para Jogador e Endereco
+
+        2) Resolver as warnings. 
+
+        3) Incluir o campo número no Endereço.
+
+        4) Implementar o CRUD para Modo (id, nome e status).
+
+        5) Implementar o VueLidate no CRUD de Modo.
+    -->
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <title>CRUD com Vue</title>
+</head>
+<body>
+<div class="container" id="app">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#menu1">Jogador</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#menu2">Endereço</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#menu3">Modo</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#menu4">Objetivo</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- OUTROS MENUS AQUI... -->
+
+    <!-- MENU 3 - CRUD MODO -->
+    <div id="menu3" class="tab-pane fade">
+      <h3>Modo</h3>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Alterar</th>
+            <th>Remover</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(m, index) in modos">
+            <td>{{ m.id }}</td>
+            <td>{{ m.nome }}</td>
+            <td><input type="checkbox" disabled v-model="m.status"></td>
+            <td><button class="btn btn-warning" @click="editModo(index)">Alterar</button></td>
+            <td><button class="btn btn-danger" @click="remModo(index)">Remover</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Formulário de Modo</h4>
+      <div class="form-group">
+        <label>ID</label>
+        <input type="text" class="form-control" v-model="novo_modo.id" disabled />
+      </div>
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" class="form-control" v-model="novo_modo.nome" />
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <input type="checkbox" v-model="novo_modo.status" />
+      </div>
+      <button class="btn btn-primary" @click="addModo">Salvar</button>
+      <button class="btn btn-default" @click="cleanFormularioModo">Limpar</button>
+    </div>
+
+    <!-- OUTROS MENUS AQUI... -->
+
+  </div>
+</div>
+
+<script>
+  var dados = {
+    "modos": JSON.parse(localStorage.getItem("modos") || "[]"),
+    "novo_modo": { indice: '', id: '', nome: '', status: false }
+  };
+
+  var app = new Vue({
+    el: "#app",
+    data: dados,
+    methods: {
+      addModo: function () {
+        var nome = this.novo_modo.nome.trim();
+
+        if (nome.length < 1 || nome.length > 20) {
+          alert("Nome do modo deve ter entre 1 e 20 caracteres.");
+          return;
+        }
+
+        if (isNaN(parseInt(this.novo_modo.indice))) {
+          var proximo_id = this.modos.length === 0 ? 1 : this.modos[this.modos.length - 1].id + 1;
+          this.modos.push({
+            id: proximo_id,
+            nome: nome,
+            status: this.novo_modo.status
+          });
+          alert("Modo cadastrado!");
+        } else {
+          this.modos[this.novo_modo.indice] = {
+            id: this.novo_modo.id,
+            nome: nome,
+            status: this.novo_modo.status
+          };
+          alert("Modo alterado!");
+        }
+
+        localStorage.setItem("modos", JSON.stringify(this.modos));
+        this.cleanFormularioModo();
+      },
+
+      editModo: function (index) {
+        var modo = this.modos[index];
+        this.novo_modo.indice = index;
+        this.novo_modo.id = modo.id;
+        this.novo_modo.nome = modo.nome;
+        this.novo_modo.status = modo.status;
+      },
+
+      remModo: function (index) {
+        if (confirm("Deseja realmente remover o modo?")) {
+          this.modos.splice(index, 1);
+          localStorage.setItem("modos", JSON.stringify(this.modos));
+          alert("Modo removido.");
+        }
+      },
+
+      cleanFormularioModo: function () {
+        this.novo_modo = { indice: '', id: '', nome: '', status: false };
+      }
+    },
+    created: function () {
+      this.cleanFormularioModo();
+    }
+  });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
